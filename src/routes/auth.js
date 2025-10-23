@@ -137,7 +137,7 @@ async function authRoutes(fastify, options) {
   
   // GET /api/auth/profile - получение профиля пользователя
   fastify.get('/profile', {
-    preHandler: [fastify.authenticate]
+    preHandler: [fastify.jwt.verify]
   }, async (request, reply) => {
     try {
       const userId = request.user.id;

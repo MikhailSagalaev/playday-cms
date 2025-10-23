@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlayDay CMS - Тестирование</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+        .test-button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #2980b9;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 PlayDay CMS - Тестирование API</h1>
+        
+        <div class="test-section">
+            <h3>📡 Базовые тесты</h3>
+            <button class="test-button" onclick="testHealth()">Health Check</button>
+            <button class="test-button" onclick="testRoot()">Root Endpoint</button>
+            <button class="test-button" onclick="testDocs()">API Documentation</button>
+            <div id="basic-results" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🌐 API Endpoints</h3>
+            <button class="test-button" onclick="testLocations()">Get Locations</button>
+            <button class="test-button" onclick="testTilda()">Tilda Integration</button>
+            <button class="test-button" onclick="testCORS()">CORS Test</button>
+            <div id="api-results" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Статус системы</h3>
+            <button class="test-button" onclick="testAll()">Запустить все тесты</button>
+            <div id="status-results" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000';
+        
+        async function makeRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                
+                const data = await response.json();
+                return {
+                    success: true,
+                    status: response.status,
+                    data: data
+                };
+            } catch (error) {
+                return {
+                    success: false,
+                    error: error.message
+                };
+            }
+        }
+
+        function showResult(elementId, result, isSuccess = true) {
+            const element = document.getElementById(elementId);
+            const className = isSuccess ? 'success' : 'error';
+            element.innerHTML = `<div class="${className}">${JSON.stringify(result, null, 2)}</div>`;
+        }
+
+        async function testHealth() {
+            const result = await makeRequest(`${API_BASE}/health`);
+            showResult('basic-results', result, result.success);
+        }
+
+        async function testRoot() {
+            const result = await makeRequest(`${API_BASE}/`);
+            showResult('basic-results', result, result.success);
+        }
+
+        async function testDocs() {
+            const result = await makeRequest(`${API_BASE}/docs`);
+            showResult('basic-results', result, result.success);
+        }
+
+        async function testLocations() {
+            const result = await makeRequest(`${API_BASE}/api/locations`);
+            showResult('api-results', result, result.success);
+        }
+
+        async function testTilda() {
+            const result = await makeRequest(`${API_BASE}/api/tilda/fetch-content`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    profile: { login: 'test_user' },
+                    project_id: 'test_project'
+                })
+            });
+            showResult('api-results', result, result.success);
+        }
+
+        async function testCORS() {
+            const result = await makeRequest(`${API_BASE}/api/locations`, {
+                method: 'OPTIONS',
+                headers: {
+                    'Origin': 'http://localhost:3000',
+                    'Access-Control-Request-Method': 'GET'
+                }
+            });
+            showResult('api-results', result, result.success);
+        }
+
+        async function testAll() {
+            const tests = [
+                { name: 'Health Check', fn: testHealth },
+                { name: 'Root Endpoint', fn: testRoot },
+                { name: 'Locations API', fn: testLocations },
+                { name: 'Tilda Integration', fn: testTilda }
+            ];
+
+            let results = [];
+            
+            for (const test of tests) {
+                try {
+                    const result = await test.fn();
+                    results.push({
+                        test: test.name,
+                        success: result.success,
+                        status: result.status || 'N/A'
+                    });
+                } catch (error) {
+                    results.push({
+                        test: test.name,
+                        success: false,
+                        error: error.message
+                    });
+                }
+            }
+
+            const successCount = results.filter(r => r.success).length;
+            const totalCount = results.length;
+            
+            showResult('status-results', {
+                summary: `${successCount}/${totalCount} тестов прошли успешно`,
+                results: results
+            }, successCount === totalCount);
+        }
+
+        // Автоматический тест при загрузке
+        window.onload = function() {
+            setTimeout(() => {
+                testAll();
+            }, 1000);
+        };
+    </script>
+</body>
+</html>

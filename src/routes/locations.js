@@ -1,13 +1,12 @@
 const { query } = require('../config/database');
 const { locationSchema } = require('../schemas/location');
+const { authenticate, authorize } = require('../middleware/auth');
 
 async function locationsRoutes(fastify, options) {
-  // Регистрируем middleware аутентификации
-  fastify.register(require('../middleware/auth'));
 
   // GET /api/locations - получение списка локаций
   fastify.get('/', {
-    preHandler: [fastify.authenticate, fastify.authorize(['admin', 'manager', 'user'])]
+    preHandler: [authenticate, authorize(['admin', 'manager', 'user'])]
   }, async (request, reply) => {
     try {
       const userId = request.user.userId;
@@ -44,7 +43,7 @@ async function locationsRoutes(fastify, options) {
 
   // GET /api/locations/:id - получение конкретной локации
   fastify.get('/:id', {
-    preHandler: [fastify.authenticate, fastify.authorize(['admin', 'manager', 'user'])]
+    preHandler: [authenticate, authorize(['admin', 'manager', 'user'])]
   }, async (request, reply) => {
     try {
       const { id } = request.params;
@@ -90,7 +89,7 @@ async function locationsRoutes(fastify, options) {
     schema: {
       body: locationSchema.create
     },
-    preHandler: [fastify.authenticate, fastify.authorize(['admin', 'manager'])]
+    preHandler: [authenticate, authorize(['admin', 'manager'])]
   }, async (request, reply) => {
     try {
       const userId = request.user.userId;
@@ -155,7 +154,7 @@ async function locationsRoutes(fastify, options) {
     schema: {
       body: locationSchema.update
     },
-    preHandler: [fastify.authenticate, fastify.authorize(['admin', 'manager', 'editor'])]
+    preHandler: [authenticate, authorize(['admin', 'manager', 'editor'])]
   }, async (request, reply) => {
     try {
       const { id } = request.params;
@@ -217,7 +216,7 @@ async function locationsRoutes(fastify, options) {
 
   // DELETE /api/locations/:id - удаление локации
   fastify.delete('/:id', {
-    preHandler: [fastify.authenticate, fastify.authorize(['admin', 'manager'])]
+    preHandler: [authenticate, authorize(['admin', 'manager'])]
   }, async (request, reply) => {
     try {
       const { id } = request.params;

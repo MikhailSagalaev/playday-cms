@@ -78,6 +78,9 @@ async function registerRoutes() {
   // Управление файлами
   await fastify.register(require('./routes/files'), { prefix: '/api/files' });
   
+  // Вебхуки
+  await fastify.register(require('./routes/webhook'), { prefix: '/api/webhook' });
+  
   // Интеграция с Tilda
   await fastify.register(require('./routes/tilda'), { prefix: '/api/tilda' });
   

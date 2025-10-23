@@ -1,0 +1,61 @@
+{
+  "name": "playday-cms",
+  "version": "1.0.0",
+  "description": "Система управления контентом для развлекательных центров - замена Make+Airtable+Collabza",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "migrate": "node scripts/migrate.js",
+    "migrate:airtable": "node scripts/migrate-airtable.js",
+    "seed": "node scripts/seed.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix"
+  },
+  "keywords": [
+    "cms",
+    "entertainment",
+    "tilda",
+    "fastify",
+    "postgresql"
+  ],
+  "author": "PlayDay Team",
+  "license": "MIT",
+  "dependencies": {
+    "fastify": "^4.24.3",
+    "@fastify/cors": "^8.4.0",
+    "@fastify/multipart": "^8.0.0",
+    "@fastify/jwt": "^7.2.4",
+    "@fastify/rate-limit": "^9.1.0",
+    "@fastify/helmet": "^11.1.1",
+    "@fastify/swagger": "^8.12.0",
+    "@fastify/swagger-ui": "^2.0.0",
+    "pg": "^8.11.3",
+    "dotenv": "^16.3.1",
+    "pino": "^8.16.2",
+    "pino-pretty": "^10.2.3",
+    "ajv": "^8.12.0",
+    "ajv-formats": "^2.1.1",
+    "sharp": "^0.32.6",
+    "uuid": "^9.0.1",
+    "bcryptjs": "^2.4.3",
+    "joi": "^17.11.0",
+    "airtable": "^0.12.2",
+    "node-cron": "^3.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "eslint": "^8.54.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.1.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

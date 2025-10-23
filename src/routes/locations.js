@@ -1,12 +1,12 @@
 const { query } = require('../config/database');
 const { locationSchema } = require('../schemas/location');
-const { authenticate, authorize } = require('../middleware/auth');
+const { authenticate, requireRole } = require('../middleware/auth');
 
 async function locationsRoutes(fastify, options) {
 
   // GET /api/locations - получение списка локаций
   fastify.get('/', {
-    preHandler: [authenticate, authorize(['admin', 'manager', 'user'])]
+    preHandler: [authenticate, requireRole(['admin', 'manager', 'user'])]
   }, async (request, reply) => {
     try {
       const userId = request.user.userId;
@@ -43,7 +43,7 @@ async function locationsRoutes(fastify, options) {
 
   // GET /api/locations/:id - получение конкретной локации
   fastify.get('/:id', {
-    preHandler: [authenticate, authorize(['admin', 'manager', 'user'])]
+    preHandler: [authenticate, requireRole(['admin', 'manager', 'user'])]
   }, async (request, reply) => {
     try {
       const { id } = request.params;
@@ -89,7 +89,7 @@ async function locationsRoutes(fastify, options) {
     schema: {
       body: locationSchema.create
     },
-    preHandler: [authenticate, authorize(['admin', 'manager'])]
+    preHandler: [authenticate, requireRole(['admin', 'manager'])]
   }, async (request, reply) => {
     try {
       const userId = request.user.userId;
@@ -154,7 +154,7 @@ async function locationsRoutes(fastify, options) {
     schema: {
       body: locationSchema.update
     },
-    preHandler: [authenticate, authorize(['admin', 'manager', 'editor'])]
+    preHandler: [authenticate, requireRole(['admin', 'manager', 'editor'])]
   }, async (request, reply) => {
     try {
       const { id } = request.params;
@@ -216,7 +216,7 @@ async function locationsRoutes(fastify, options) {
 
   // DELETE /api/locations/:id - удаление локации
   fastify.delete('/:id', {
-    preHandler: [authenticate, authorize(['admin', 'manager'])]
+    preHandler: [authenticate, requireRole(['admin', 'manager'])]
   }, async (request, reply) => {
     try {
       const { id } = request.params;

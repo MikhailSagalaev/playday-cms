@@ -87,6 +87,9 @@ async function registerRoutes() {
   // Интеграция с Tilda
   await fastify.register(require('./routes/tilda'), { prefix: '/api/tilda' });
   
+  // Публичный API (без авторизации)
+  await fastify.register(require('./routes/public'), { prefix: '/api/public' });
+  
   // Здоровье системы
   fastify.get('/health', async (request, reply) => {
     return { 

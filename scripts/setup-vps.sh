@@ -141,14 +141,14 @@ log "PostgreSQL настроен"
 
 # 10. Создание директорий
 log "Создаем директории для приложения..."
-mkdir -p /var/www/playday-cms
-mkdir -p /var/www/playday-cms/uploads
-mkdir -p /var/www/playday-cms/logs
-mkdir -p /var/www/playday-cms/backups
+mkdir -p /opt/playday-cms
+mkdir -p /opt/playday-cms/uploads
+mkdir -p /opt/playday-cms/logs
+mkdir -p /opt/playday-cms/backups
 
 # Устанавливаем права
-chown -R playday:playday /var/www/playday-cms
-chmod -R 755 /var/www/playday-cms
+chown -R playday:playday /opt/playday-cms
+chmod -R 755 /opt/playday-cms
 
 log "Директории созданы"
 
@@ -195,7 +195,7 @@ server {
     
     # Статические файлы (загруженные изображения)
     location /uploads/ {
-        alias /var/www/playday-cms/uploads/;
+        alias /opt/playday-cms/uploads/;
         expires 30d;
         add_header Cache-Control "public, immutable";
         

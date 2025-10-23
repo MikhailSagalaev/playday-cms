@@ -8,7 +8,7 @@ set -e
 # Параметры
 DOMAIN=${1:-""}
 EMAIL=${2:-"admin@$DOMAIN"}
-APP_DIR="/var/www/playday-cms"
+APP_DIR="/opt/playday-cms"
 
 # Цвета для вывода
 RED='\033[0;31m'

@@ -7,9 +7,9 @@ set -e
 
 # Параметры
 ENVIRONMENT=${1:-production}
-APP_DIR="/var/www/playday-cms"
-BACKUP_DIR="/var/www/playday-cms/backups"
-LOG_FILE="/var/www/playday-cms/logs/deploy.log"
+APP_DIR="/opt/playday-cms"
+BACKUP_DIR="/opt/playday-cms/backups"
+LOG_FILE="/opt/playday-cms/logs/deploy.log"
 
 # Цвета для вывода
 RED='\033[0;31m'

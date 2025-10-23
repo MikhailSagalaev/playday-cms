@@ -9,7 +9,7 @@ cd /opt/metabase
 docker-compose up -d
 ```
 
-**Доступ к Metabase:** `http://62.109.26.35:3001`
+**Доступ к Metabase:** `http://62.109.26.35/metabase`
 
 ## 🔧 Первичная настройка
 
@@ -242,7 +242,7 @@ sudo systemctl reload nginx
 sudo apt install php-fpm php-pgsql -y
 ```
 
-**Доступ к Adminer:** `http://62.109.26.35:3002`
+**Доступ к Adminer:** `http://62.109.26.35/adminer` (или на порту 3002)
 
 **Вход:**
 - System: PostgreSQL

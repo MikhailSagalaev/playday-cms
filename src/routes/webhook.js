@@ -4,6 +4,21 @@ async function webhookRoutes(fastify, options) {
   
   // POST /api/webhook/tilda - обработка вебхука от Tilda
   fastify.post('/tilda', {
+    preHandler: async (request, reply) => {
+      // Проверяем, что запрос пришел с домена play-day.ru
+      const origin = request.headers.origin || request.headers.referer;
+      const allowedDomains = ['https://play-day.ru', 'http://play-day.ru', 'https://play-day.ru/', 'http://play-day.ru/'];
+      
+      if (!origin || !allowedDomains.some(domain => origin.startsWith(domain))) {
+        fastify.log.warn(`Вебхук заблокирован с домена: ${origin}`);
+        return reply.code(403).send({
+          error: 'Forbidden',
+          message: 'Доступ запрещен. Вебхук должен приходить с домена play-day.ru'
+        });
+      }
+      
+      fastify.log.info(`Вебхук принят с домена: ${origin}`);
+    },
     schema: {
       body: {
         type: 'array',
@@ -186,9 +201,15 @@ async function webhookRoutes(fastify, options) {
       
     } catch (error) {
       fastify.log.error('Ошибка обработки вебхука от Tilda:', error);
+      fastify.log.error('Детали ошибки:', {
+        message: error.message,
+        stack: error.stack,
+        code: error.code
+      });
       reply.code(500).send({
         error: 'Internal Server Error',
-        message: 'Ошибка при обработке данных от Tilda'
+        message: 'Ошибка при обработке данных от Tilda',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
   });

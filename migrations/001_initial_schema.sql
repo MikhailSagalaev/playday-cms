@@ -89,6 +89,12 @@ CREATE TABLE locations (
     накопление_4 INTEGER,
     привилегия_4 TEXT,
     
+    -- Дополнительные поля из Tilda
+    ma_name VARCHAR(255),
+    ma_email VARCHAR(255),
+    tranid VARCHAR(255),
+    formid VARCHAR(255),
+    
     -- Метаданные
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()

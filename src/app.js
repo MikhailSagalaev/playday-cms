@@ -36,6 +36,9 @@ async function registerPlugins() {
     secret: process.env.JWT_SECRET || 'your-secret-key-change-in-production'
   });
 
+  // Поддержка application/x-www-form-urlencoded для вебхуков Tilda
+  await fastify.register(require('@fastify/formbody'));
+
   // Multipart для загрузки файлов
   await fastify.register(require('@fastify/multipart'), {
     limits: {

@@ -11,12 +11,13 @@ services:
       - MB_DB_PORT=5432
       - MB_DB_USER=metabase
       - MB_DB_PASS=metabase_password
-      - MB_DB_HOST=host.docker.internal
-      - MB_SITE_URL=http://62.109.26.35/metabase
+      - MB_DB_HOST=172.17.0.1
+      - MB_SITE_URL=http://62.109.26.35:3001
     volumes:
       - metabase-data:/metabase-data
     restart: unless-stopped
-    network_mode: host
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
 volumes:
   metabase-data:

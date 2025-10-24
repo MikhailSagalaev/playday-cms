@@ -16,7 +16,7 @@
   // Укажите email вашей локации
   window.PLAYDAY_LOCATION_EMAIL = 'gcity@play-day.ru';
 </script>
-<script src="http://62.109.26.35/playday-tilda.js"></script>
+<script src="https://62.109.26.35/playday-tilda.js"></script>
 ```
 
 ### 2. Добавьте CSS классы к элементам
@@ -98,7 +98,7 @@ GET /api/public/location/:identifier
 ### Пример запроса:
 
 ```bash
-curl http://62.109.26.35/api/public/location/gcity@play-day.ru
+curl https://62.109.26.35/api/public/location/gcity@play-day.ru
 ```
 
 ### Пример ответа:
@@ -158,7 +158,7 @@ const PLAYDAY_LOCATION_EMAIL = profile.email || window.PLAYDAY_LOCATION_EMAIL ||
 1. Проверьте консоль браузера на наличие ошибок
 2. Убедитесь, что CSS классы добавлены правильно
 3. Проверьте, что email локации указан верно
-4. Проверьте, что API доступен: `http://62.109.26.35/api/public/location/gcity@play-day.ru`
+4. Проверьте, что API доступен: `https://62.109.26.35/api/public/location/gcity@play-day.ru`
 
 ## 🔄 Обновление скрипта на сервере
 
@@ -170,4 +170,4 @@ git pull origin main
 sudo systemctl reload nginx
 ```
 
-Скрипт будет доступен по адресу: `http://62.109.26.35/playday-tilda.js`
+Скрипт будет доступен по адресу: `https://62.109.26.35/playday-tilda.js`

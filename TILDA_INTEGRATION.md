@@ -15,8 +15,84 @@
 <script>
   // Укажите email вашей локации
   window.PLAYDAY_LOCATION_EMAIL = 'gcity@play-day.ru';
+  
+  // Встроенный скрипт PlayDay CMS
+  (function() {
+    'use strict';
+    
+    const PLAYDAY_API_URL = 'http://62.109.26.35/api/public/location';
+    const PLAYDAY_LOCATION_EMAIL = window.PLAYDAY_LOCATION_EMAIL || 'gcity@play-day.ru';
+    
+    $(document).ready(function() {
+      console.log('🚀 PlayDay CMS: Загрузка данных для', PLAYDAY_LOCATION_EMAIL);
+      
+      $.ajax({
+        url: `${PLAYDAY_API_URL}/${encodeURIComponent(PLAYDAY_LOCATION_EMAIL)}`,
+        method: 'GET',
+        dataType: 'json',
+        success: function(data) {
+          if (!data || !data.records || data.records.length === 0) {
+            console.error('❌ PlayDay CMS: Данные не найдены');
+            return;
+          }
+          
+          const record = data.records[0];
+          console.log('✅ PlayDay CMS: Данные получены', record);
+          
+          // Заполняем контент
+          fillPageContent(record);
+        },
+        error: function(xhr, status, error) {
+          console.error('❌ PlayDay CMS: Ошибка загрузки данных', error);
+        }
+      });
+    });
+    
+    function fillPageContent(record) {
+      // Базовая информация
+      setContent('.nazvanie .tn-atom', record.название);
+      setContent('.email .tn-atom', record.email);
+      setContent('.phone .tn-atom', record.номер_телефона);
+      setContent('.address .tn-atom', record.адрес);
+      
+      if (record.описание) {
+        $('.description .tn-atom').html(record.описание);
+      }
+      
+      if (record.картинка) {
+        $('.coverimg .tn-atom__img').attr('src', record.картинка);
+      }
+      
+      // Тайм-карты
+      setContent('.1h-card .tn-atom', record.тайм_карта_1_час);
+      setContent('.2h-card .tn-atom', record.тайм_карта_2_часа);
+      setContent('.3h-card .tn-atom', record.тайм_карта_3_часа);
+      setContent('.4h-card .tn-atom', record.тайм_карта_4_часа);
+      setContent('.5h-card .tn-atom', record.тайм_карта_5_часов);
+      
+      // Призы
+      setContent('.prizetxt1 .tn-atom', record.приз_1_текст);
+      setContent('.prizetxt2 .tn-atom', record.приз_2_текст);
+      setContent('.prizetxt3 .tn-atom', record.приз_3_текст);
+      
+      // Цены
+      if (record.тайм_карта_1_час_цена) {
+        setContent('.time-card1 .tn-atom', record.тайм_карта_1_час_цена + ' руб.');
+      }
+      
+      console.log('✅ PlayDay CMS: Контент заполнен успешно');
+    }
+    
+    function setContent(selector, content) {
+      if (content !== null && content !== undefined && content !== '') {
+        const $element = $(selector);
+        if ($element.length > 0) {
+          $element.html(content);
+        }
+      }
+    }
+  })();
 </script>
-<script src="https://62.109.26.35/playday-tilda.js"></script>
 ```
 
 ### 2. Добавьте CSS классы к элементам

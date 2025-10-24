@@ -89,7 +89,8 @@ dist
 
 # Gatsby files
 .cache/
-public
+# public - НЕ игнорируем, нужен для Tilda интеграции
+# public
 
 # Storybook build outputs
 .out

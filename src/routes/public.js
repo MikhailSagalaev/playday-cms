@@ -9,7 +9,7 @@ async function publicRoutes(fastify, options) {
       
       fastify.log.info(`📥 Запрос данных локации: ${identifier}`);
       
-      // Ищем по email или record_id
+      // Ищем по email локации, record_id или email администратора (ma_email)
       const result = await query(
         `SELECT 
           id, название, email, адрес, описание, номер_телефона, картинка,
@@ -25,7 +25,7 @@ async function publicRoutes(fastify, options) {
           накопление_3, привилегия_3, накопление_4, привилегия_4,
           record_id, created_at, updated_at
         FROM locations 
-        WHERE email = $1 OR record_id = $1
+        WHERE email = $1 OR record_id = $1 OR ma_email = $1
         ORDER BY updated_at DESC
         LIMIT 1`,
         [identifier]

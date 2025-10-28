@@ -16,7 +16,7 @@
   // ===========================================
   
   // URL вашего PlayDay CMS API
-  const PLAYDAY_API_URL = 'https://62.109.26.35/api/public/location';
+  const PLAYDAY_API_URL = 'https://api.play-day.ru/api/public/location';
   
   // Email локации для получения данных (можно также использовать record_id)
   // Получаем из профиля Tilda Members или из параметра URL

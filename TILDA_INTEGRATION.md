@@ -8,7 +8,20 @@
 
 ### 1. Вставьте скрипт на страницу Tilda
 
-Откройте нужную страницу в редакторе Tilda и добавьте блок **T123 (HTML-код)**:
+Откройте нужную страницу в редакторе Tilda и добавьте блок **T123 (HTML-код)**.
+
+#### Вариант A: Внешний скрипт (рекомендуется)
+
+```html
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  // Укажите email вашей локации
+  window.PLAYDAY_LOCATION_EMAIL = 'gcity@play-day.ru';
+</script>
+<script src="https://api.play-day.ru/playday-tilda.js"></script>
+```
+
+#### Вариант B: Встроенный скрипт (если внешний не работает)
 
 ```html
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -20,7 +33,7 @@
   (function() {
     'use strict';
     
-    const PLAYDAY_API_URL = 'http://62.109.26.35/api/public/location';
+    const PLAYDAY_API_URL = 'https://api.play-day.ru/api/public/location';
     const PLAYDAY_LOCATION_EMAIL = window.PLAYDAY_LOCATION_EMAIL || 'gcity@play-day.ru';
     
     $(document).ready(function() {

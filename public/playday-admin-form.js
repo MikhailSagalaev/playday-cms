@@ -37,18 +37,22 @@
       '{}'
     );
     
-    if (!profile.email) {
+    // Ищем email в разных полях профиля
+    const userEmail = profile.email || profile.ma_email || profile.login;
+    
+    if (!userEmail) {
       console.error('❌ PlayDay Admin Form: Email пользователя не найден');
+      console.log('Профиль:', profile);
       block.text('Ошибка: необходимо войти в систему');
       block.css('text-align', 'center').show();
       return;
     }
     
-    console.log('🚀 PlayDay Admin Form: Загрузка данных для', profile.email);
+    console.log('🚀 PlayDay Admin Form: Загрузка данных для', userEmail);
     
     // Загружаем данные локации из API
     $.ajax({
-      url: `${PLAYDAY_API_URL}/${encodeURIComponent(profile.email)}`,
+      url: `${PLAYDAY_API_URL}/${encodeURIComponent(userEmail)}`,
       method: 'GET',
       dataType: 'json',
       success: function(data) {

@@ -14,11 +14,11 @@ const fastify = require('fastify')({
 
 // Регистрация плагинов
 async function registerPlugins() {
-  // CORS для интеграции с Tilda
-  await fastify.register(require('@fastify/cors'), {
-    origin: process.env.CORS_ORIGIN || true,
-    credentials: process.env.CORS_CREDENTIALS === 'true'
-  });
+  // CORS отключен - обрабатывается на уровне Nginx
+  // await fastify.register(require('@fastify/cors'), {
+  //   origin: process.env.CORS_ORIGIN || true,
+  //   credentials: process.env.CORS_CREDENTIALS === 'true'
+  // });
 
   // Безопасность
   await fastify.register(require('@fastify/helmet'), {

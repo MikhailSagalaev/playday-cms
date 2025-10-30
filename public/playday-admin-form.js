@@ -19,15 +19,39 @@
   const PLAYDAY_API_URL = 'https://api.play-day.ru/api/public/location';
   
   // ID блока формы (например: 'rec759480568')
-  const FORM_BLOCK_ID = 'rec759480568'; // Замените на ID вашего блока
+  // Если не указан, скрипт автоматически найдёт форму на странице
+  const FORM_BLOCK_ID = window.PLAYDAY_FORM_BLOCK_ID || '';
   
   // ===========================================
   // ОСНОВНОЙ КОД
   // ===========================================
   
   $(document).ready(function() {
-    const block_id = FORM_BLOCK_ID.replace('rec', '');
-    const block = $('#' + FORM_BLOCK_ID).removeClass('r_hidden').hide();
+    // Автоматический поиск формы, если ID блока не указан
+    let block;
+    if (FORM_BLOCK_ID) {
+      block = $('#' + FORM_BLOCK_ID);
+    } else {
+      // Ищем форму с скрытыми полями ma_email или ma_name
+      $('form').each(function() {
+        if ($(this).find('input[name="ma_email"]').length > 0 || 
+            $(this).find('input[name="ma_name"]').length > 0) {
+          block = $(this).closest('[id^="rec"]');
+          if (block.length === 0) {
+            block = $(this); // Если нет обёртки rec, используем саму форму
+          }
+          console.log('🔍 PlayDay Admin Form: Форма найдена автоматически:', block.attr('id') || 'без ID');
+          return false; // Прерываем цикл
+        }
+      });
+    }
+    
+    if (!block || block.length === 0) {
+      console.error('❌ PlayDay Admin Form: Форма не найдена. Укажите PLAYDAY_FORM_BLOCK_ID или добавьте скрытое поле ma_email в форму.');
+      return;
+    }
+    
+    block.removeClass('r_hidden').hide();
     
     // Получаем профиль пользователя из Tilda Members
     const project_id = $('#allrecords').attr('data-tilda-project-id');
@@ -91,6 +115,13 @@
    * Заполняет форму данными из API
    */
   function fillForm(block, record) {
+    console.log('📝 PlayDay Admin Form: Начало заполнения формы');
+    console.log('📝 Блок формы:', block.attr('id') || block.prop('tagName'));
+    
+    // Подсчёт заполненных полей
+    let filledFieldsCount = 0;
+    let totalFieldsCount = 0;
+    
     // Заполняем заголовок и описание формы (если есть)
     if (record.название) {
       block.find('.t-section__title').text(record.название);
@@ -102,6 +133,7 @@
     
     // Обходим все поля формы
     block.find('.t-input-group').each(function() {
+      totalFieldsCount++;
       const item = $(this);
       
       // Текстовые поля (email, name, input, url, date, time, range, quantity)
@@ -121,6 +153,8 @@
           input.val(record[field]);
           input.trigger('change');
           input.trigger('keyup');
+          filledFieldsCount++;
+          console.log(`  ✓ Заполнено поле "${field}":`, record[field]);
         }
       }
       
@@ -236,10 +270,22 @@
       
       if (field && field in record && record[field] !== null) {
         input.val(record[field]);
+        filledFieldsCount++;
       }
     });
     
-    console.log('✅ PlayDay Admin Form: Форма заполнена успешно');
+    console.log(`✅ PlayDay Admin Form: Форма заполнена успешно`);
+    console.log(`📊 Статистика: заполнено ${filledFieldsCount} полей из ${totalFieldsCount} найденных`);
+    
+    if (filledFieldsCount === 0) {
+      console.warn('⚠️ ВНИМАНИЕ: Ни одно поле не заполнено!');
+      console.warn('⚠️ Возможные причины:');
+      console.warn('   1. Названия полей в форме не совпадают с ключами API');
+      console.warn('   2. Форма ещё не загружена в момент выполнения скрипта');
+      console.warn('   3. Неправильный селектор блока формы');
+      console.log('🔍 Доступные ключи в record:', Object.keys(record));
+      console.log('🔍 Найдено полей в форме:', totalFieldsCount);
+    }
   }
   
 })();

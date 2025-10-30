@@ -48,6 +48,7 @@
       return;
     }
     
+    console.log('🔍 PlayDay Admin Form: Профиль пользователя:', profile);
     console.log('🚀 PlayDay Admin Form: Загрузка данных для', userEmail);
     
     // Загружаем данные локации из API
@@ -64,6 +65,12 @@
         
         const record = data.records[0];
         console.log('✅ PlayDay Admin Form: Данные получены', record);
+        
+        // Проверка: совпадает ли Email из ответа с запрошенным
+        if (record.Email && record.Email !== userEmail) {
+          console.warn('⚠️ PlayDay Admin Form: ВНИМАНИЕ! Запрошен email:', userEmail, 'но получен:', record.Email);
+          console.warn('⚠️ Возможно, в Tilda Members указан неправильный email администратора');
+        }
         
         // Заполняем форму
         fillForm(block, record);

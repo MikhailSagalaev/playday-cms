@@ -316,15 +316,26 @@ function sanitizeHtml(html) {
 }
 
 // Функция для валидации URL изображений
+// Принимает любые валидные URL (с любого домена)
 function validateImageUrl(url) {
   if (!url) return true;
   
-  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
-  const urlLower = url.toLowerCase();
-  
-  return imageExtensions.some(ext => urlLower.includes(ext)) || 
-         url.includes('ucarecdn.com') || 
-         url.includes('tildacdn.com');
+  try {
+    // Проверяем, что это валидный URL
+    const urlObj = new URL(url);
+    
+    // Проверяем, что протокол http или https
+    if (!['http:', 'https:'].includes(urlObj.protocol)) {
+      return false;
+    }
+    
+    // Дополнительная проверка: если URL не содержит расширение изображения,
+    // но это не критично - принимаем любые валидные URL
+    return true;
+  } catch (error) {
+    // Если не удалось распарсить URL, это невалидный URL
+    return false;
+  }
 }
 
 module.exports = {

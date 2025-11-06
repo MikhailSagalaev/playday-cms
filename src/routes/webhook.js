@@ -130,11 +130,20 @@ async function webhookRoutes(fastify, options) {
         let paramIndex = 1;
         
         for (const [key, value] of Object.entries(locationData)) {
-          if (key !== 'record_id') {
-            fields.push(`${key} = $${paramIndex}`);
-            values.push(value);
-            paramIndex++;
-          }
+          if (key === 'record_id') continue;
+          // Пропускаем пустые значения, чтобы не затирать существующие данные
+          const isEmptyString = value === '';
+          const isNullish = value === null || value === undefined;
+          if (isNullish || isEmptyString) continue;
+          fields.push(`${key} = $${paramIndex}`);
+          values.push(value);
+          paramIndex++;
+        }
+
+        // Если нет ни одного поля для обновления — просто подтверждаем приём
+        if (fields.length === 0) {
+          fastify.log.info(`ℹ️ Нет изменений для ${locationData.record_id} — пустые поля пропущены`);
+          return reply.code(200).send('OK');
         }
         
         const updateQuery = `

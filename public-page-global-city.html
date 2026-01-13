@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Глобал Сити - Развлекательный центр</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ff6b6b;
+            --secondary-color: #4ecdc4;
+            --accent-color: #45b7d1;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 4rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .card {
+            border: none;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 2rem;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 1.5rem;
+        }
+
+        .price-card {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+        }
+
+        .price-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .prize-card {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            height: 100%;
+        }
+
+        .prize-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .loyalty-level {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            color: #333;
+        }
+
+        .contact-info {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 15px;
+            padding: 2rem;
+            color: #333;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 4rem 0;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+            color: #333;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border-radius: 2px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: var(--primary-color) !important;
+        }
+
+        .global-city-theme {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .promotion-card {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            color: #333;
+            margin-bottom: 2rem;
+        }
+
+        .promotion-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 2rem 0;
+            }
+            
+            .price-value {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Навигация -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-globe me-2"></i>Глобал Сити
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#prices">Цены</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#prizes">Призы</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#loyalty">Лояльность</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#promotions">Акции</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Контакты</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Загрузка -->
+    <div id="loadingSection" class="loading">
+        <div class="container">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Загрузка...</span>
+            </div>
+            <p class="mt-3">Загрузка информации о центре...</p>
+        </div>
+    </div>
+
+    <!-- Основной контент -->
+    <div id="mainContent" style="display: none;">
+        <!-- Hero секция -->
+        <section class="hero-section">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-6">
+                        <h1 class="display-4 fw-bold mb-4" id="heroTitle">Глобал Сити</h1>
+                        <p class="lead mb-4" id="heroDescription">Крупнейший развлекательный центр с современными игровыми автоматами и уникальной системой призов</p>
+                        <div class="mb-4">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            <span id="heroAddress">Адрес загружается...</span>
+                        </div>
+                        <div class="mb-4">
+                            <i class="fas fa-phone me-2"></i>
+                            <span id="heroPhone">Телефон загружается...</span>
+                        </div>
+                        <a href="#prices" class="btn btn-primary btn-lg">
+                            <i class="fas fa-play me-2"></i>Начать играть
+                        </a>
+                    </div>
+                    <div class="col-lg-6 text-center">
+                        <img id="heroImage" src="" alt="Глобал Сити" class="img-fluid rounded-3 shadow-lg" style="display: none;">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Цены на тайм-карты -->
+        <section id="prices" class="py-5">
+            <div class="container">
+                <h2 class="section-title">Тайм-карты и цены</h2>
+                <div class="row" id="pricesContainer">
+                    <!-- Цены будут загружены динамически -->
+                </div>
+                
+                <!-- Дополнительная информация о ценах -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">💳 Пополнение игровой карты</h5>
+                                <p class="card-text">Рекомендуемая сумма пополнения: <strong id="recommendedAmount">Загрузка...</strong></p>
+                                <small class="text-muted">Пополняйте карту и получайте бонусы по системе лояльности!</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Призы -->
+        <section id="prizes" class="py-5 bg-light">
+            <div class="container">
+                <h2 class="section-title">Призы и розыгрыши</h2>
+                
+                <div class="row mb-5" id="prizesContainer">
+                    <!-- Призы будут загружены динамически -->
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="fas fa-gift text-primary me-2"></i>О наших призах
+                                </h5>
+                                <p class="card-text" id="prizesText">Загрузка...</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="fas fa-clock text-primary me-2"></i>Розыгрыш тайм-карт
+                                </h5>
+                                <p class="card-text" id="timecardPrizesText">Загрузка...</p>
+                                <div class="mt-3 p-3 bg-light rounded">
+                                    <strong>📅 Следующий розыгрыш:</strong><br>
+                                    <span id="nextDrawDate" class="text-primary fs-5">Загрузка...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Система лояльности -->
+        <section id="loyalty" class="py-5">
+            <div class="container">
+                <h2 class="section-title">Система лояльности Глобал Сити</h2>
+                
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-coins me-2"></i>Пополнения и бонусы
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted mb-3">Чем больше пополняете, тем больше бонусов получаете!</p>
+                                <div id="bonusLevels">
+                                    <!-- Уровни бонусов будут загружены динамически -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-star me-2"></i>Накопления и привилегии
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted mb-3">Накапливайте и получайте эксклюзивные привилегии!</p>
+                                <div id="privilegeLevels">
+                                    <!-- Уровни привилегий будут загружены динамически -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Акции -->
+        <section id="promotions" class="py-5 bg-light">
+            <div class="container">
+                <h2 class="section-title">Акции и специальные предложения</h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="promotion-card">
+                            <h3 id="thursdayTitle">🎯 Загрузка...</h3>
+                            <p id="thursdayText" class="mb-0">Загрузка...</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="fas fa-percentage me-2"></i>Дополнительные скидки
+                                </h5>
+                                <ul class="list-unstyled">
+                                    <li id="discount1" class="mb-2"><i class="fas fa-check text-success me-2"></i>Загрузка...</li>
+                                    <li id="discount2" class="mb-2"><i class="fas fa-check text-success me-2"></i>Загрузка...</li>
+                                </ul>
+                                <div class="mt-3 p-3 bg-light rounded">
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Условия акций уточняйте у администратора
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Контакты -->
+        <section id="contact" class="py-5">
+            <div class="container">
+                <h2 class="section-title">Как нас найти</h2>
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="contact-info">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5><i class="fas fa-map-marker-alt me-2"></i>Адрес</h5>
+                                    <p id="contactAddress">Загрузка...</p>
+                                    <small class="text-muted">Удобное расположение в центре города</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5><i class="fas fa-phone me-2"></i>Телефон</h5>
+                                    <p id="contactPhone">Загрузка...</p>
+                                    <small class="text-muted">Звоните для бронирования</small>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <h5><i class="fas fa-envelope me-2"></i>Email</h5>
+                                    <p id="contactEmail">Загрузка...</p>
+                                    <small class="text-muted">Для вопросов и предложений</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5><i class="fas fa-clock me-2"></i>Режим работы</h5>
+                                    <p>Ежедневно с 10:00 до 22:00</p>
+                                    <small class="text-muted">Без выходных и праздников</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container text-center">
+            <p>&copy; 2024 Глобал Сити. Все права защищены.</p>
+            <p class="small">Powered by PlayDay CMS</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        const API_BASE_URL = 'https://api.play-day.ru/api';
+        const LOCATION_EMAIL = 'gcity@play-day.ru'; // Email для Глобал Сити
+
+        // Загрузка данных
+        async function loadLocationData() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/public/location/${encodeURIComponent(LOCATION_EMAIL)}`);
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || 'Ошибка загрузки данных');
+                }
+                
+                if (data.records && data.records.length > 0) {
+                    const location = data.records[0];
+                    populatePage(location);
+                } else {
+                    throw new Error('Данные о локации не найдены');
+                }
+                
+            } catch (error) {
+                console.error('Ошибка загрузки данных:', error);
+                showError('Ошибка загрузки данных о центре');
+            } finally {
+                $('#loadingSection').hide();
+                $('#mainContent').show();
+            }
+        }
+
+        // Заполнение страницы данными
+        function populatePage(location) {
+            // Hero секция
+            $('#heroTitle').text(location.название || 'Глобал Сити');
+            $('#heroDescription').text(location.описание || 'Крупнейший развлекательный центр');
+            $('#heroAddress').text(location.адрес || 'Адрес уточняется');
+            $('#heroPhone').text(location.номер_телефона || 'Телефон уточняется');
+            
+            if (location.картинка) {
+                $('#heroImage').attr('src', location.картинка).show();
+            }
+
+            // Цены на тайм-карты
+            populatePrices(location);
+
+            // Призы
+            populatePrizes(location);
+
+            // Система лояльности
+            populateLoyalty(location);
+
+            // Акции
+            populatePromotions(location);
+
+            // Контакты
+            $('#contactAddress').text(location.адрес || 'Адрес уточняется');
+            $('#contactPhone').text(location.номер_телефона || 'Телефон уточняется');
+            $('#contactEmail').text(location.email || 'Email уточняется');
+
+            // Рекомендуемая сумма пополнения
+            $('#recommendedAmount').text(location.пополнить_карту_сумма ? `${location.пополнить_карту_сумма}₽` : 'Уточняется');
+        }
+
+        // Заполнение цен
+        function populatePrices(location) {
+            const prices = [
+                { time: '1 час', game: location.тайм_карта_1_час, price: location.тайм_карта_1_час_цена },
+                { time: '2 часа', game: location.тайм_карта_2_часа, price: location.тайм_карта_2_часа_цена },
+                { time: '3 часа', game: location.тайм_карта_3_часа, price: location.тайм_карта_3_часа_цена },
+                { time: '4 часа', game: location.тайм_карта_4_часа, price: location.тайм_карта_4_часа_цена },
+                { time: '5 часов', game: location.тайм_карта_5_часов, price: location.тайм_карта_5_часов_цена }
+            ];
+
+            let pricesHtml = '';
+            prices.forEach(item => {
+                if (item.price) {
+                    pricesHtml += `
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="price-card">
+                                <h5>${item.time}</h5>
+                                <div class="price-value">${item.price}₽</div>
+                                ${item.game ? `<p>Игровое время: ${item.game}</p>` : ''}
+                                <small>Лучшая цена в городе!</small>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            $('#pricesContainer').html(pricesHtml || '<div class="col-12"><p class="text-center">Цены уточняются</p></div>');
+        }
+
+        // Заполнение призов
+        function populatePrizes(location) {
+            const prizes = [
+                { text: location.приз_1_текст, image: location.приз_1_картинка },
+                { text: location.приз_2_текст, image: location.приз_2_картинка },
+                { text: location.приз_3_текст, image: location.приз_3_картинка }
+            ];
+
+            let prizesHtml = '';
+            prizes.forEach((prize, index) => {
+                if (prize.text || prize.image) {
+                    prizesHtml += `
+                        <div class="col-md-4 mb-4">
+                            <div class="prize-card">
+                                ${prize.image ? `<img src="${prize.image}" alt="Приз ${index + 1}" class="prize-image">` : ''}
+                                <h5>🏆 Приз ${index + 1}</h5>
+                                <p>${prize.text || 'Описание приза'}</p>
+                                <small class="text-muted">Участвуйте в розыгрыше!</small>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            $('#prizesContainer').html(prizesHtml || '<div class="col-12"><p class="text-center">Информация о призах обновляется</p></div>');
+
+            // Общая информация о призах
+            $('#prizesText').text(location.призы_текст || 'Каждую неделю разыгрываем ценные призы среди наших игроков!');
+            $('#timecardPrizesText').text(location.розыгрыш_тайм_карт_текст || 'Еженедельный розыгрыш бесплатных тайм-карт!');
+            $('#nextDrawDate').text(location.дата_следующего_розыгрыша || 'Дата уточняется');
+        }
+
+        // Заполнение системы лояльности
+        function populateLoyalty(location) {
+            // Бонусы
+            let bonusHtml = '';
+            for (let i = 1; i <= 6; i++) {
+                const replenishment = location[`пополнение_${i}`];
+                const bonus = location[`бонус_${i}`];
+                
+                if (replenishment && bonus) {
+                    bonusHtml += `
+                        <div class="loyalty-level">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span><strong>Пополни ${replenishment}₽</strong></span>
+                                <span class="badge bg-success">+${bonus}₽ бонус</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            $('#bonusLevels').html(bonusHtml || '<p class="text-center">Информация о бонусах обновляется</p>');
+
+            // Привилегии
+            let privilegeHtml = '';
+            for (let i = 1; i <= 4; i++) {
+                const accumulation = location[`накопление_${i}`];
+                const privilege = location[`привилегия_${i}`];
+                
+                if (accumulation && privilege) {
+                    privilegeHtml += `
+                        <div class="loyalty-level">
+                            <div class="text-center">
+                                <strong>💎 Накопи ${accumulation}₽</strong><br>
+                                <span class="text-info">${privilege}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            $('#privilegeLevels').html(privilegeHtml || '<p class="text-center">Информация о привилегиях обновляется</p>');
+        }
+
+        // Заполнение акций
+        function populatePromotions(location) {
+            $('#thursdayTitle').text(location.заголовок_четверг_по_30 || '🎯 Четверг по 30%');
+            $('#thursdayText').text(location.каждый_четверг_текст || 'Каждый четверг скидка 30% на все игры!');
+            $('#discount1').html(`<i class="fas fa-check text-success me-2"></i>${location.скидка_1 || 'Скидка для постоянных клиентов'}`);
+            $('#discount2').html(`<i class="fas fa-check text-success me-2"></i>${location.скидка_2 || 'Скидка на групповые посещения'}`);
+        }
+
+        // Показать ошибку
+        function showError(message) {
+            $('#mainContent').html(`
+                <div class="container py-5">
+                    <div class="alert alert-danger text-center">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        ${message}
+                    </div>
+                </div>
+            `);
+        }
+
+        // Плавная прокрутка для навигации
+        $('a[href^="#"]').on('click', function(e) {
+            e.preventDefault();
+            const target = $($(this).attr('href'));
+            if (target.length) {
+                $('html, body').animate({
+                    scrollTop: target.offset().top - 80
+                }, 800);
+            }
+        });
+
+        // Загрузка данных при загрузке страницы
+        $(document).ready(function() {
+            loadLocationData();
+        });
+    </script>
+</body>
+</html>

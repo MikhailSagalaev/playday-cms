@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет Avenue Sever - PlayDay CMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .admin-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+        .form-section {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        }
+        .image-preview {
+            max-width: 200px;
+            max-height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        .alert {
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="admin-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1><i class="fas fa-gamepad me-3"></i>Avenue Sever - Личный кабинет</h1>
+                    <p class="mb-0">Управление контентом развлекательного центра</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <span id="userEmail" class="badge bg-light text-dark fs-6"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <!-- Статус загрузки -->
+        <div id="loadingStatus" class="loading">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Загрузка...</span>
+            </div>
+            <p class="mt-2">Загрузка данных...</p>
+        </div>
+
+        <!-- Уведомления -->
+        <div id="alertContainer"></div>
+
+        <!-- Основная форма -->
+        <form id="avenueForm" style="display: none;">
+            <input type="hidden" name="record_id" id="record_id">
+            
+            <!-- Основная информация -->
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-info-circle me-2"></i>Основная информация</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="название" class="form-label">Название локации *</label>
+                                <input type="text" class="form-control" name="название" id="название" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="название_лк" class="form-label">Название ЛК</label>
+                                <input type="text" class="form-control" name="название_лк" id="название_лк" value="Avenue Sever" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email *</label>
+                                <input type="email" class="form-control" name="email" id="email" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="номер_телефона" class="form-label">Номер телефона</label>
+                                <input type="tel" class="form-control" name="номер_телефона" id="номер_телефона">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="адрес" class="form-label">Адрес</label>
+                        <textarea class="form-control" name="адрес" id="адрес" rows="2"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="описание" class="form-label">Описание</label>
+                        <textarea class="form-control" name="описание" id="описание" rows="4"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="картинка" class="form-label">Главная картинка (URL)</label>
+                        <input type="url" class="form-control" name="картинка" id="картинка">
+                        <img id="картинка_preview" class="image-preview" style="display: none;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Тайм-карты -->
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-clock me-2"></i>Тайм-карты</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Игровое время</h6>
+                            <div class="mb-3">
+                                <label for="тайм_карта_1_час" class="form-label">1 час</label>
+                                <input type="number" class="form-control" name="тайм_карта_1_час" id="тайм_карта_1_час">
+                            </div>
+                            <div class="mb-3">
+                                <label for="тайм_карта_2_часа" class="form-label">2 часа</label>
+                                <input type="number" class="form-control" name="тайм_карта_2_часа" id="тайм_карта_2_часа">
+                            </div>
+                            <div class="mb-3">
+                                <label for="тайм_карта_3_часа" class="form-label">3 часа</label>
+                                <input type="number" class="form-control" name="тайм_карта_3_часа" id="тайм_карта_3_часа">
+                            </div>
+                            <div class="mb-3">
+                                <label for="тайм_карта_4_часа" class="form-label">4 часа</label>
+                                <input type="number" class="form-control" name="тайм_карта_4_часа" id="тайм_карта_4_часа">
+                            </div>
+                            <div class="mb-3">
+                                <label for="тайм_карта_5_часов" class="form-label">5 часов</label>
+                                <input type="number" class="form-control" name="тайм_карта_5_часов" id="тайм_карта_5_часов">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Цены (руб.)</h6>
+                            <div class="mb-3">
+                                <label for="тайм_карта_1_час_цена" class="form-label">1 час - цена</label>
+                                <input type="number" class="form-control" name="тайм_карта_1_час_цена" id="тайм_карта_1_час_цена">
+                            </div>
+                            <div class="mb-3">
+                                <label for="тайм_карта_2_часа_цена" class="form-label">2 часа - цена</label>
+                                <input type="number" class="form-control" name="тайм_карта_2_часа_цена" id="тайм_карта_2_часа_цена">
+                            </div>
+                            <div class="mb-3">
+                                <label for="тайм_карта_3_часа_цена" class="form-label">3 часа - цена</label>
+                                <input type="number" class="form-control" name="тайм_карта_3_часа_цена" id="тайм_карта_3_часа_цена">
+                            </div>
+                            <div class="mb-3">
+                                <label for="тайм_карта_4_часа_цена" class="form-label">4 часа - цена</label>
+                                <input type="number" class="form-control" name="тайм_карта_4_часа_цена" id="тайм_карта_4_часа_цена">
+                            </div>
+                            <div class="mb-3">
+                                <label for="тайм_карта_5_часов_цена" class="form-label">5 часов - цена</label>
+                                <input type="number" class="form-control" name="тайм_карта_5_часов_цена" id="тайм_карта_5_часов_цена">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Призы -->
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-gift me-2"></i>Призы и розыгрыши</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6>Приз 1</h6>
+                            <div class="mb-3">
+                                <label for="приз_1_текст" class="form-label">Текст</label>
+                                <textarea class="form-control" name="приз_1_текст" id="приз_1_текст" rows="3"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="приз_1_картинка" class="form-label">Картинка (URL)</label>
+                                <input type="url" class="form-control" name="приз_1_картинка" id="приз_1_картинка">
+                                <img id="приз_1_картинка_preview" class="image-preview" style="display: none;">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>Приз 2</h6>
+                            <div class="mb-3">
+                                <label for="приз_2_текст" class="form-label">Текст</label>
+                                <textarea class="form-control" name="приз_2_текст" id="приз_2_текст" rows="3"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="приз_2_картинка" class="form-label">Картинка (URL)</label>
+                                <input type="url" class="form-control" name="приз_2_картинка" id="приз_2_картинка">
+                                <img id="приз_2_картинка_preview" class="image-preview" style="display: none;">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>Приз 3</h6>
+                            <div class="mb-3">
+                                <label for="приз_3_текст" class="form-label">Текст</label>
+                                <textarea class="form-control" name="приз_3_текст" id="приз_3_текст" rows="3"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="приз_3_картинка" class="form-label">Картинка (URL)</label>
+                                <input type="url" class="form-control" name="приз_3_картинка" id="приз_3_картинка">
+                                <img id="приз_3_картинка_preview" class="image-preview" style="display: none;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="призы_текст" class="form-label">Общий текст о призах</label>
+                                <textarea class="form-control" name="призы_текст" id="призы_текст" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="розыгрыш_тайм_карт_текст" class="form-label">Розыгрыш тайм-карт</label>
+                                <textarea class="form-control" name="розыгрыш_тайм_карт_текст" id="розыгрыш_тайм_карт_текст" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="пополнить_карту_сумма" class="form-label">Сумма пополнения карты</label>
+                                <input type="number" class="form-control" name="пополнить_карту_сумма" id="пополнить_карту_сумма">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="дата_следующего_розыгрыша" class="form-label">Дата следующего розыгрыша</label>
+                                <input type="text" class="form-control" name="дата_следующего_розыгрыша" id="дата_следующего_розыгрыша">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Система лояльности -->
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-star me-2"></i>Система лояльности</h5>
+                </div>
+                <div class="card-body">
+                    <h6>Пополнения и бонусы</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="пополнение_1" class="form-label">Пополнение 1</label>
+                                        <input type="number" class="form-control" name="пополнение_1" id="пополнение_1">
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="бонус_1" class="form-label">Бонус 1</label>
+                                        <input type="number" class="form-control" name="бонус_1" id="бонус_1">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="пополнение_2" class="form-label">Пополнение 2</label>
+                                        <input type="number" class="form-control" name="пополнение_2" id="пополнение_2">
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="бонус_2" class="form-label">Бонус 2</label>
+                                        <input type="number" class="form-control" name="бонус_2" id="бонус_2">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="пополнение_3" class="form-label">Пополнение 3</label>
+                                        <input type="number" class="form-control" name="пополнение_3" id="пополнение_3">
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="бонус_3" class="form-label">Бонус 3</label>
+                                        <input type="number" class="form-control" name="бонус_3" id="бонус_3">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="пополнение_4" class="form-label">Пополнение 4</label>
+                                        <input type="number" class="form-control" name="пополнение_4" id="пополнение_4">
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="бонус_4" class="form-label">Бонус 4</label>
+                                        <input type="number" class="form-control" name="бонус_4" id="бонус_4">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="пополнение_5" class="form-label">Пополнение 5</label>
+                                        <input type="number" class="form-control" name="пополнение_5" id="пополнение_5">
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="бонус_5" class="form-label">Бонус 5</label>
+                                        <input type="number" class="form-control" name="бонус_5" id="бонус_5">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="пополнение_6" class="form-label">Пополнение 6</label>
+                                        <input type="number" class="form-control" name="пополнение_6" id="пополнение_6">
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="бонус_6" class="form-label">Бонус 6</label>
+                                        <input type="number" class="form-control" name="бонус_6" id="бонус_6">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="mt-4">Накопления и привилегии</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="накопление_1" class="form-label">Накопление 1</label>
+                                        <input type="number" class="form-control" name="накопление_1" id="накопление_1">
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="привилегия_1" class="form-label">Привилегия 1</label>
+                                        <input type="text" class="form-control" name="привилегия_1" id="привилегия_1">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="накопление_2" class="form-label">Накопление 2</label>
+                                        <input type="number" class="form-control" name="накопление_2" id="накопление_2">
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="привилегия_2" class="form-label">Привилегия 2</label>
+                                        <input type="text" class="form-control" name="привилегия_2" id="привилегия_2">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="накопление_3" class="form-label">Накопление 3</label>
+                                        <input type="number" class="form-control" name="накопление_3" id="накопление_3">
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="привилегия_3" class="form-label">Привилегия 3</label>
+                                        <input type="text" class="form-control" name="привилегия_3" id="привилегия_3">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="накопление_4" class="form-label">Накопление 4</label>
+                                        <input type="number" class="form-control" name="накопление_4" id="накопление_4">
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="привилегия_4" class="form-label">Привилегия 4</label>
+                                        <input type="text" class="form-control" name="привилегия_4" id="привилегия_4">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Акции -->
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-percent me-2"></i>Акции и скидки</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="заголовок_четверг_по_30" class="form-label">Заголовок "Четверг по 30%"</label>
+                                <input type="text" class="form-control" name="заголовок_четверг_по_30" id="заголовок_четверг_по_30">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="каждый_четверг_текст" class="form-label">Текст акции четверга</label>
+                                <textarea class="form-control" name="каждый_четверг_текст" id="каждый_четверг_текст" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="скидка_1" class="form-label">Скидка 1</label>
+                                <input type="text" class="form-control" name="скидка_1" id="скидка_1">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="скидка_2" class="form-label">Скидка 2</label>
+                                <input type="text" class="form-control" name="скидка_2" id="скидка_2">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Кнопки управления -->
+            <div class="card">
+                <div class="card-body text-center">
+                    <button type="submit" class="btn btn-primary btn-lg me-3">
+                        <i class="fas fa-save me-2"></i>Сохранить изменения
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-lg" onclick="loadData()">
+                        <i class="fas fa-refresh me-2"></i>Обновить данные
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        const API_BASE_URL = 'https://api.play-day.ru/api';
+        const LOCATION_EMAIL = 'avenue@play-day.ru'; // Email для Avenue Sever
+        
+        // Показать уведомление
+        function showAlert(message, type = 'info') {
+            const alertHtml = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-circle' : 'info-circle'} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            $('#alertContainer').html(alertHtml);
+            
+            // Автоматически скрыть через 5 секунд
+            setTimeout(() => {
+                $('.alert').alert('close');
+            }, 5000);
+        }
+
+        // Загрузка данных
+        async function loadData() {
+            $('#loadingStatus').show();
+            $('#avenueForm').hide();
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/public/location/${encodeURIComponent(LOCATION_EMAIL)}`);
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || 'Ошибка загрузки данных');
+                }
+                
+                if (data.records && data.records.length > 0) {
+                    fillForm(data.records[0]);
+                    showAlert('Данные успешно загружены', 'success');
+                } else {
+                    showAlert('Данные не найдены. Форма будет пустой.', 'warning');
+                }
+                
+                $('#userEmail').text(LOCATION_EMAIL);
+                $('#avenueForm').show();
+                
+            } catch (error) {
+                console.error('Ошибка загрузки:', error);
+                showAlert(`Ошибка загрузки данных: ${error.message}`, 'danger');
+            } finally {
+                $('#loadingStatus').hide();
+            }
+        }
+
+        // Заполнение формы
+        function fillForm(record) {
+            console.log('Заполнение формы данными:', record);
+            
+            // Заполняем все поля формы
+            Object.keys(record).forEach(key => {
+                const element = document.getElementById(key);
+                if (element && record[key] !== null && record[key] !== undefined) {
+                    element.value = record[key];
+                    
+                    // Показываем превью картинок
+                    if (key.includes('картинка') && record[key]) {
+                        const preview = document.getElementById(key + '_preview');
+                        if (preview) {
+                            preview.src = record[key];
+                            preview.style.display = 'block';
+                        }
+                    }
+                }
+            });
+        }
+
+        // Сохранение данных
+        async function saveData(formData) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/webhook/tilda`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.message || 'Ошибка сохранения');
+                }
+                
+                showAlert('Данные успешно сохранены!', 'success');
+                
+                // Перезагружаем данные
+                setTimeout(() => {
+                    loadData();
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Ошибка сохранения:', error);
+                showAlert(`Ошибка сохранения: ${error.message}`, 'danger');
+            }
+        }
+
+        // Обработка отправки формы
+        $('#avenueForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            // Добавляем обязательные поля
+            formData.set('email', LOCATION_EMAIL);
+            formData.set('название_лк', 'Avenue Sever');
+            
+            showAlert('Сохранение данных...', 'info');
+            saveData(formData);
+        });
+
+        // Превью картинок
+        $('input[type="url"]').on('input', function() {
+            const url = $(this).val();
+            const fieldName = $(this).attr('name');
+            
+            if (fieldName && fieldName.includes('картинка')) {
+                const preview = $(`#${fieldName}_preview`);
+                if (preview.length) {
+                    if (url && url.startsWith('http')) {
+                        preview.attr('src', url).show();
+                    } else {
+                        preview.hide();
+                    }
+                }
+            }
+        });
+
+        // Загрузка данных при загрузке страницы
+        $(document).ready(function() {
+            loadData();
+        });
+    </script>
+</body>
+</html>

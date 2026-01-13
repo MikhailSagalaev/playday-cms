@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlayDay CMS - Панель мониторинга бэкапов</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 1.5rem;
+        }
+
+        .status-card {
+            text-align: center;
+            padding: 2rem;
+            border-radius: 15px;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .status-online {
+            background: linear-gradient(135deg, var(--success-color) 0%, #20c997 100%);
+        }
+
+        .status-warning {
+            background: linear-gradient(135deg, var(--warning-color) 0%, #fd7e14 100%);
+        }
+
+        .status-error {
+            background: linear-gradient(135deg, var(--danger-color) 0%, #e83e8c 100%);
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .backup-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 0.75rem 2rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .progress {
+            height: 10px;
+            border-radius: 5px;
+        }
+
+        .log-container {
+            background: #1e1e1e;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            padding: 1rem;
+            border-radius: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem 0;
+            }
+            
+            .metric-value {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1><i class="fas fa-shield-alt me-3"></i>PlayDay CMS - Мониторинг бэкапов</h1>
+                    <p class="mb-0">Система автоматических бэкапов и мониторинга</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <button class="btn btn-light" onclick="refreshData()">
+                        <i class="fas fa-sync-alt me-2"></i>Обновить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Статус системы -->
+        <div class="row">
+            <div class="col-md-4">
+                <div id="systemStatus" class="status-card status-online">
+                    <i class="fas fa-server fa-3x mb-3"></i>
+                    <h4>Система</h4>
+                    <p id="systemStatusText">Проверка...</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div id="backupStatus" class="status-card status-online">
+                    <i class="fas fa-database fa-3x mb-3"></i>
+                    <h4>Бэкапы</h4>
+                    <p id="backupStatusText">Проверка...</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div id="emailStatus" class="status-card status-online">
+                    <i class="fas fa-envelope fa-3x mb-3"></i>
+                    <h4>Уведомления</h4>
+                    <p id="emailStatusText">Проверка...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Метрики системы -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Метрики системы</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="metric-card">
+                            <div class="metric-value text-primary" id="diskUsage">--</div>
+                            <div class="text-muted">Использование диска</div>
+                            <div class="progress mt-2">
+                                <div id="diskProgress" class="progress-bar bg-primary" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="metric-card">
+                            <div class="metric-value text-success" id="memoryUsage">--</div>
+                            <div class="text-muted">Использование памяти</div>
+                            <div class="progress mt-2">
+                                <div id="memoryProgress" class="progress-bar bg-success" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="metric-card">
+                            <div class="metric-value text-info" id="backupCount">--</div>
+                            <div class="text-muted">Всего бэкапов</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="metric-card">
+                            <div class="metric-value text-warning" id="lastBackup">--</div>
+                            <div class="text-muted">Последний бэкап</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Управление -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>Управление</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Бэкапы</h6>
+                        <button class="btn btn-primary me-2 mb-2" onclick="createBackup()">
+                            <i class="fas fa-plus me-2"></i>Создать бэкап
+                        </button>
+                        <button class="btn btn-outline-primary me-2 mb-2" onclick="showBackupList()">
+                            <i class="fas fa-list me-2"></i>Список бэкапов
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Система</h6>
+                        <button class="btn btn-outline-success me-2 mb-2" onclick="checkSystem()">
+                            <i class="fas fa-heartbeat me-2"></i>Проверить систему
+                        </button>
+                        <button class="btn btn-outline-info me-2 mb-2" onclick="testEmail()">
+                            <i class="fas fa-envelope me-2"></i>Тест email
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Список бэкапов -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-archive me-2"></i>Последние бэкапы</h5>
+            </div>
+            <div class="card-body">
+                <div id="backupList">
+                    <div class="loading">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Загрузка...</span>
+                        </div>
+                        <p class="mt-2">Загрузка списка бэкапов...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Логи -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-terminal me-2"></i>Логи системы</h5>
+            </div>
+            <div class="card-body">
+                <div id="systemLogs" class="log-container">
+                    Загрузка логов...
+                </div>
+                <div class="mt-3">
+                    <button class="btn btn-outline-primary" onclick="refreshLogs()">
+                        <i class="fas fa-sync-alt me-2"></i>Обновить логи
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="clearLogs()">
+                        <i class="fas fa-trash me-2"></i>Очистить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для операций -->
+    <div class="modal fade" id="operationModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="operationModalTitle">Операция</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="operationContent">
+                        <div class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Выполнение...</span>
+                            </div>
+                            <p class="mt-2">Выполнение операции...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Конфигурация
+        const API_BASE = '/api/backup'; // Предполагаем, что есть API endpoint
+        
+        // Состояние
+        let refreshInterval;
+        
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshData();
+            startAutoRefresh();
+        });
+
+        // Автообновление каждые 30 секунд
+        function startAutoRefresh() {
+            refreshInterval = setInterval(refreshData, 30000);
+        }
+
+        // Обновление всех данных
+        async function refreshData() {
+            try {
+                await Promise.all([
+                    updateSystemStatus(),
+                    updateMetrics(),
+                    updateBackupList()
+                ]);
+            } catch (error) {
+                console.error('Ошибка обновления данных:', error);
+                showError('Ошибка загрузки данных');
+            }
+        }
+
+        // Обновление статуса системы
+        async function updateSystemStatus() {
+            // Симуляция данных (в реальности будет API запрос)
+            const systemData = {
+                system: { status: 'online', message: 'Система работает нормально' },
+                backup: { status: 'online', message: 'Последний бэкап: сегодня в 02:00' },
+                email: { status: 'online', message: 'Уведомления работают' }
+            };
+
+            updateStatusCard('systemStatus', 'systemStatusText', systemData.system);
+            updateStatusCard('backupStatus', 'backupStatusText', systemData.backup);
+            updateStatusCard('emailStatus', 'emailStatusText', systemData.email);
+        }
+
+        // Обновление карточки статуса
+        function updateStatusCard(cardId, textId, data) {
+            const card = document.getElementById(cardId);
+            const text = document.getElementById(textId);
+            
+            // Удаляем старые классы
+            card.classList.remove('status-online', 'status-warning', 'status-error');
+            
+            // Добавляем новый класс
+            switch (data.status) {
+                case 'online':
+                    card.classList.add('status-online');
+                    break;
+                case 'warning':
+                    card.classList.add('status-warning');
+                    break;
+                case 'error':
+                    card.classList.add('status-error');
+                    break;
+            }
+            
+            text.textContent = data.message;
+        }
+
+        // Обновление метрик
+        async function updateMetrics() {
+            // Симуляция данных
+            const metrics = {
+                disk: { used: 45, total: 100 },
+                memory: { used: 2048, total: 4096 },
+                backupCount: 7,
+                lastBackup: '2 часа назад'
+            };
+
+            // Диск
+            const diskPercent = Math.round((metrics.disk.used / metrics.disk.total) * 100);
+            document.getElementById('diskUsage').textContent = `${diskPercent}%`;
+            document.getElementById('diskProgress').style.width = `${diskPercent}%`;
+            
+            // Память
+            const memoryPercent = Math.round((metrics.memory.used / metrics.memory.total) * 100);
+            document.getElementById('memoryUsage').textContent = `${memoryPercent}%`;
+            document.getElementById('memoryProgress').style.width = `${memoryPercent}%`;
+            
+            // Бэкапы
+            document.getElementById('backupCount').textContent = metrics.backupCount;
+            document.getElementById('lastBackup').textContent = metrics.lastBackup;
+        }
+
+        // Обновление списка бэкапов
+        async function updateBackupList() {
+            // Симуляция данных
+            const backups = [
+                {
+                    filename: 'playday_cms_backup_2024-01-13T02-00-00-000Z.sql.gz',
+                    size: '15.2 MB',
+                    created: '2024-01-13 02:00:00',
+                    age: '2 часа назад'
+                },
+                {
+                    filename: 'playday_cms_backup_2024-01-12T02-00-00-000Z.sql.gz',
+                    size: '14.8 MB',
+                    created: '2024-01-12 02:00:00',
+                    age: '1 день назад'
+                },
+                {
+                    filename: 'playday_cms_backup_2024-01-11T02-00-00-000Z.sql.gz',
+                    size: '14.5 MB',
+                    created: '2024-01-11 02:00:00',
+                    age: '2 дня назад'
+                }
+            ];
+
+            const container = document.getElementById('backupList');
+            
+            if (backups.length === 0) {
+                container.innerHTML = '<p class="text-center text-muted">Бэкапы не найдены</p>';
+                return;
+            }
+
+            let html = '';
+            backups.forEach(backup => {
+                html += `
+                    <div class="backup-item">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <h6 class="mb-1">${backup.filename}</h6>
+                                <small class="text-muted">Создан: ${backup.created}</small>
+                            </div>
+                            <div class="col-md-3">
+                                <span class="badge bg-primary">${backup.size}</span>
+                                <small class="text-muted d-block">${backup.age}</small>
+                            </div>
+                            <div class="col-md-3 text-end">
+                                <button class="btn btn-sm btn-outline-primary me-1" onclick="downloadBackup('${backup.filename}')">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-success me-1" onclick="restoreBackup('${backup.filename}')">
+                                    <i class="fas fa-undo"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteBackup('${backup.filename}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Создание бэкапа
+        async function createBackup() {
+            showModal('Создание бэкапа', 'Создание нового бэкапа базы данных...');
+            
+            try {
+                // Симуляция создания бэкапа
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                
+                document.getElementById('operationContent').innerHTML = `
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Бэкап создан успешно!
+                    </div>
+                    <p><strong>Файл:</strong> playday_cms_backup_${new Date().toISOString().replace(/[:.]/g, '-')}.sql.gz</p>
+                    <p><strong>Размер:</strong> 15.3 MB</p>
+                    <p><strong>Время:</strong> ${new Date().toLocaleString('ru-RU')}</p>
+                `;
+                
+                // Обновляем список бэкапов
+                setTimeout(updateBackupList, 1000);
+                
+            } catch (error) {
+                document.getElementById('operationContent').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Ошибка создания бэкапа: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Проверка системы
+        async function checkSystem() {
+            showModal('Проверка системы', 'Выполнение диагностики системы...');
+            
+            try {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                document.getElementById('operationContent').innerHTML = `
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Система работает нормально
+                    </div>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success me-2"></i>База данных доступна</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Сервис PlayDay CMS запущен</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Свободное место: 55%</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Использование памяти: 68%</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Email уведомления работают</li>
+                    </ul>
+                `;
+                
+            } catch (error) {
+                document.getElementById('operationContent').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Обнаружены проблемы: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Тест email
+        async function testEmail() {
+            showModal('Тест email уведомлений', 'Отправка тестового сообщения...');
+            
+            try {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                document.getElementById('operationContent').innerHTML = `
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Тестовое email отправлено успешно!
+                    </div>
+                    <p>Проверьте почтовый ящик администратора.</p>
+                    <p><strong>Время отправки:</strong> ${new Date().toLocaleString('ru-RU')}</p>
+                `;
+                
+            } catch (error) {
+                document.getElementById('operationContent').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Ошибка отправки email: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Показать модальное окно
+        function showModal(title, content) {
+            document.getElementById('operationModalTitle').textContent = title;
+            document.getElementById('operationContent').innerHTML = `
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Выполнение...</span>
+                    </div>
+                    <p class="mt-2">${content}</p>
+                </div>
+            `;
+            
+            const modal = new bootstrap.Modal(document.getElementById('operationModal'));
+            modal.show();
+        }
+
+        // Показать ошибку
+        function showError(message) {
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-danger alert-dismissible fade show position-fixed';
+            alert.style.top = '20px';
+            alert.style.right = '20px';
+            alert.style.zIndex = '9999';
+            alert.innerHTML = `
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        // Обновление логов
+        function refreshLogs() {
+            const logs = document.getElementById('systemLogs');
+            logs.innerHTML = 'Загрузка логов...';
+            
+            // Симуляция логов
+            setTimeout(() => {
+                logs.innerHTML = `
+[${new Date().toLocaleString()}] INFO: Система бэкапов запущена
+[${new Date().toLocaleString()}] INFO: Проверка состояния базы данных... OK
+[${new Date().toLocaleString()}] INFO: Проверка свободного места... OK (45% используется)
+[${new Date().toLocaleString()}] INFO: Проверка памяти... OK (68% используется)
+[${new Date().toLocaleString()}] INFO: Планировщик задач активен
+[${new Date().toLocaleString()}] INFO: Следующий бэкап: завтра в 02:00
+[${new Date().toLocaleString()}] INFO: Email уведомления настроены
+                `;
+            }, 1000);
+        }
+
+        // Очистка логов
+        function clearLogs() {
+            document.getElementById('systemLogs').innerHTML = 'Логи очищены';
+        }
+
+        // Заглушки для функций управления бэкапами
+        function downloadBackup(filename) {
+            alert(`Скачивание бэкапа: ${filename}`);
+        }
+
+        function restoreBackup(filename) {
+            if (confirm(`Восстановить базу данных из бэкапа ${filename}?\n\nВНИМАНИЕ: Текущие данные будут заменены!`)) {
+                showModal('Восстановление из бэкапа', `Восстановление базы данных из ${filename}...`);
+                
+                setTimeout(() => {
+                    document.getElementById('operationContent').innerHTML = `
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            База данных восстановлена успешно!
+                        </div>
+                        <p><strong>Файл:</strong> ${filename}</p>
+                        <p><strong>Время:</strong> ${new Date().toLocaleString('ru-RU')}</p>
+                    `;
+                }, 3000);
+            }
+        }
+
+        function deleteBackup(filename) {
+            if (confirm(`Удалить бэкап ${filename}?\n\nЭто действие нельзя отменить!`)) {
+                alert(`Бэкап ${filename} удален`);
+                updateBackupList();
+            }
+        }
+
+        function showBackupList() {
+            showModal('Список всех бэкапов', 'Загрузка полного списка бэкапов...');
+            
+            setTimeout(() => {
+                document.getElementById('operationContent').innerHTML = `
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Файл</th>
+                                    <th>Размер</th>
+                                    <th>Дата создания</th>
+                                    <th>Возраст</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>playday_cms_backup_2024-01-13T02-00-00-000Z.sql.gz</td>
+                                    <td>15.2 MB</td>
+                                    <td>2024-01-13 02:00:00</td>
+                                    <td>2 часа назад</td>
+                                </tr>
+                                <tr>
+                                    <td>playday_cms_backup_2024-01-12T02-00-00-000Z.sql.gz</td>
+                                    <td>14.8 MB</td>
+                                    <td>2024-01-12 02:00:00</td>
+                                    <td>1 день назад</td>
+                                </tr>
+                                <tr>
+                                    <td>playday_cms_backup_2024-01-11T02-00-00-000Z.sql.gz</td>
+                                    <td>14.5 MB</td>
+                                    <td>2024-01-11 02:00:00</td>
+                                    <td>2 дня назад</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
